@@ -61,6 +61,9 @@ y_train = y[:N]
 
 X_test = X[N:] # last 10 examples (20% of data)
 y_test = y[N:]
+# Reshape data for Keras
+X_train = X_train.reshape(-1, 1)
+X_test = X_test.reshape(-1, 1)
 
 
 # Take a single example of X
