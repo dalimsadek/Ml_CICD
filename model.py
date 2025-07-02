@@ -17,7 +17,7 @@ def plot_predictions(train_data, train_labels,  test_data, test_labels,  predict
   # Plot the predictions in red (predictions were made on the test data)
   plt.scatter(test_data, predictions, c="r", label="Predictions")
   # Show the legend
-  plt.legend(shadow='True')
+  plt.legend(shadow=True)
   # Set grids
   plt.grid(which='major', c='#cccccc', linestyle='--', alpha=0.5)
   # Some text
@@ -30,17 +30,21 @@ def plot_predictions(train_data, train_labels,  test_data, test_labels,  predict
 
 
 def mae(y_test, y_pred):
-  """
-  Calculuates mean absolute error between y_test and y_preds.
-  """
-  return tf.metrics.mean_absolute_error(y_test, y_pred)
-  
+    """
+    Calculates mean absolute error between y_test and y_pred.
+    """
+    metric = tf.keras.metrics.MeanAbsoluteError()
+    metric.update_state(y_test, y_pred)
+    return metric.result().numpy()
 
 def mse(y_test, y_pred):
-  """
-  Calculates mean squared error between y_test and y_preds.
-  """
-  return tf.metrics.mean_squared_error(y_test, y_pred)
+    """
+    Calculates mean squared error between y_test and y_pred.
+    """
+    metric = tf.keras.metrics.MeanSquaredError()
+    metric.update_state(y_test, y_pred)
+    return metric.result().numpy()
+
 
 
 # Check Tensorflow version
@@ -61,6 +65,9 @@ y_train = y[:N]
 
 X_test = X[N:] # last 10 examples (20% of data)
 y_test = y[N:]
+# Reshape data for Keras
+X_train = X_train.reshape(-1, 1)
+X_test = X_test.reshape(-1, 1)
 
 # Reshape data for Keras
 X_train = X_train.reshape(-1, 1)
@@ -98,10 +105,11 @@ plot_predictions(train_data=X_train, train_labels=y_train,  test_data=X_test, te
 
 
 # Calculate model_1 metrics
-mae_1 = np.round(float(mae(y_test, y_preds.squeeze()).numpy()), 2)
-mse_1 = np.round(float(mse(y_test, y_preds.squeeze()).numpy()), 2)
+mae_1 = np.round(float(mae(y_test, y_preds.squeeze())), 2)
+mse_1 = np.round(float(mse(y_test, y_preds.squeeze())), 2)
+
 print(f'\nMean Absolute Error = {mae_1}, Mean Squared Error = {mse_1}.')
 
 # Write metrics to file
-#with open('metrics.txt', 'w') as outfile:
-#   outfile.write(f'\nMean Absolute Error = {mae_1}, Mean Squared Error = {mse_1}.')
+with open('metrics.txt', 'w') as outfile:
+   outfile.write(f'\nMean Absolute Error = {mae_1}, Mean Squared Error = {mse_1}.')
